@@ -39,7 +39,7 @@ def generate_ai_summary(news_data):
     {news_data}
     """
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-1.5-flash',
         contents=prompt,
     )
     return response.text

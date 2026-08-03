@@ -26,7 +26,7 @@ def fetch_tsui_wah_news():
         
     return "\n".join(articles) if articles else "No news found today."
 
-# 3. AI Intelligence Layer
+# 3. AI Intelligence Layer (With Fallback for Free Tier Limits)
 def generate_ai_summary(news_data):
     client = genai.Client(api_key=GEMINI_API_KEY)
     prompt = f"""
@@ -37,11 +37,21 @@ def generate_ai_summary(news_data):
     News items:
     {news_data}
     """
-    response = client.models.generate_content(
-        model='gemini-1.5-flash-latest',
-        contents=prompt,
-    )
-    return response.text
+    
+    # Try gemini-2.5-flash first; if quota is hit, fallback to gemini-1.5-flash
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        return response.text
+    except Exception as e:
+        print(f"Primary model hit rate limit, using fallback: {e}")
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=prompt,
+        )
+        return response.text
 
 # 4. Telegram Delivery
 def send_telegram_message(text):

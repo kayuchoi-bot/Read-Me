@@ -1,0 +1,27 @@
+name: Tsui Wah Daily Telegram Digest
+
+on:
+  schedule:
+    # Runs daily at 00:00 UTC (8:00 AM Hong Kong Time)
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Enables manual test button
+
+jobs:
+  run-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: pip install google-genai requests
+        
+      - name: Run Tsui Wah Script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python tsui_wah_digest.py

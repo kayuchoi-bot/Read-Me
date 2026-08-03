@@ -12,7 +12,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # 2. Fetch Latest News via Google News RSS Feed
 def fetch_tsui_wah_news():
     query = urllib.parse.quote('"Tsui Wah" OR "翠華" OR "翠華餐廳"')
-    # Fetch HK/EN coverage
     rss_url = f"https://news.google.com/rss/search?q={query}&hl=zh-HK&gl=HK&ceid=HK:zh-Hant"
     
     headers = {'User-Agent': 'Mozilla/5.0'}
@@ -20,14 +19,14 @@ def fetch_tsui_wah_news():
     root = ET.fromstring(response.content)
     
     articles = []
-    for item in root.findall(".//item")[:10]:  # Pull top 10 relevant news items
+    for item in root.findall(".//item")[:10]:
         title = item.find("title").text if item.find("title") is not None else ""
         link = item.find("link").text if item.find("link") is not None else ""
         articles.append(f"- {title}\n  Link: {link}")
         
     return "\n".join(articles) if articles else "No news found today."
 
-# 3. AI Intelligence Layer (Gemini)
+# 3. AI Intelligence Layer
 def generate_ai_summary(news_data):
     client = genai.Client(api_key=GEMINI_API_KEY)
     prompt = f"""
